@@ -6,6 +6,7 @@ import Photo from "./components/Photo";
 
 function App() {
   const [gallery, setGallery] = useState([]);
+  const [upload, setUpload] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const getPhotos = async () => {
@@ -20,13 +21,16 @@ function App() {
 
     if (file && file.size > 0) {
       setLoading(true);
-      await Photos.insert(file);
+      const result = await Photos.insert(file);
       setLoading(false);
       getPhotos();
-    }
 
-    if (gallery instanceof Error) {
-      alert(gallery.message);
+      if (result instanceof Error) {
+        alert(result.message);
+      }
+      setUpload([]);
+    } else {
+      alert("Nenhum arquivo selecionado");
     }
   };
 
@@ -42,7 +46,12 @@ function App() {
     <div className="App">
       <h1>Galeria de fotos</h1>
       <form action="POST" onSubmit={(e) => handleSubmit(e)}>
-        <input type="file" name="image" />
+        <input
+          type="file"
+          name="image"
+          value={upload}
+          onChange={(e) => setUpload(e.target.value)}
+        />
         <input
           type="submit"
           disabled={loading}
